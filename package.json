@@ -23,7 +23,7 @@
 			},
 			{
 				"command": "gtagsc.FindDefineAndRefer",
-				"title": "查找定义与引用"
+				"title": "查找定义"
 			}
 		],
 		"viewsContainers": {
