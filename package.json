@@ -10,17 +10,12 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld",
-		"onCommand:gtagsc.FindDefineAndRefer",
-		"onView:gtags-result-item"
+		"onLanguage:c",
+		"onLanguage:cpp"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
-			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
-			},
 			{
 				"command": "gtagsc.FindDefineAndRefer",
 				"title": "查找定义"
@@ -51,6 +46,17 @@
 			  "when": "editorTextFocus"
 			}
 		  ]
+		},
+		"configuration": {
+			"type": "object",
+			"title": "GTags Setting",
+			"properties": {
+				"gtagsSupport.globalPath": {
+					"type": "string",
+					"default": "D:\\glo663wb\\bin\\global.exe",
+					"description": "global path"
+				}
+			}
 		}
 	},
 	"scripts": {

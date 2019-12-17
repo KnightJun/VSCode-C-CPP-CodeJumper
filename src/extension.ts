@@ -7,43 +7,12 @@ import { execSync, exec, ExecException,ExecSyncOptionsWithStringEncoding } from 
 
 enum GtagsFindType{
 	Reference = "-arx",
-	Definition = "-arx"
+	Definition = "-ax"
 }
 
-let treeViewProvider : TreeViewProvider;
-let gtagsRoot : String | undefined;
+let gtagsRoot : string | undefined;
+let gtagsGlobalPath : string | undefined;
 
-export class TreeItemNode extends vscode.TreeItem {
-
-	label : string;
-	description : string | boolean;
-	uri : vscode.Uri;
-	line : number;
-	iconPath?: string | vscode.Uri | { light: string | vscode.Uri; dark: string | vscode.Uri } | vscode.ThemeIcon;
-    constructor(
-		// readonly 只可读
-		public readonly loc:vscode.Location
-    ){
-		super(loc.uri, vscode.TreeItemCollapsibleState.None);
-		this.label = basename(loc.uri.toString());
-		this.description = dirname(loc.uri.fsPath).replace(<string>gtagsRoot, "");
-		this.iconPath = vscode.ThemeIcon.File;
-		this.uri = loc.uri;
-		this.line = loc.range.start.line;
-		this.iconPath = vscode.ThemeIcon.File;
-    }
-
-    // command: 为每项添加点击事件的命令
-    command = {
-        title: this.label,          // 标题
-        command: 'itemClick',       // 命令 ID
-        tooltip: this.label,        // 鼠标覆盖时的小小提示框
-        arguments: [                // 向 registerCommand 传递的参数。
-			this.loc
-        ]
-    }
-    
-}
 export class DefinitionProvider implements vscode.DefinitionProvider{
 	provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): 
 	vscode.ProviderResult<vscode.Definition | vscode.DefinitionLink[]>{
@@ -64,33 +33,6 @@ export class ReferenceProvider implements vscode.ReferenceProvider{
 	}
 }
 
-export class TreeViewProvider implements vscode.TreeDataProvider<TreeItemNode>{
-    // 自动弹出的可以暂不理会
-    private readonly _onDidChangeTreeData = new vscode.EventEmitter<TreeItemNode>();
-	readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
-	
-	itemLocations : vscode.Location[] = [];
-    // 自动弹出
-    // 获取树视图中的每一项 item,所以要返回 element
-    getTreeItem(element: TreeItemNode): vscode.TreeItem | Thenable<vscode.TreeItem> {
-        return element;
-    }
-
-    // 自动弹出，但是我们要对内容做修改
-    // 给每一项都创建一个 TreeItemNode
-    getChildren(element?: TreeItemNode | undefined): vscode.ProviderResult<TreeItemNode[]> {
-    
-        return this.itemLocations.map(
-            item => new TreeItemNode(
-				item
-            )
-        )
-    }
-	setData(itemLocations : vscode.Location[]){
-		this.itemLocations = itemLocations;
-		this._onDidChangeTreeData.fire();
-	}
-}
 function FindGtagsRoot():string | undefined{
 	if(! vscode.workspace.workspaceFolders){
 		return undefined;
@@ -112,7 +54,7 @@ function FindGtagsRoot():string | undefined{
 
 function FindGtagsByWord(word:string, ftype : GtagsFindType):vscode.Location[] | undefined{
 	let locations : vscode.Location[] = [];
-	var cmdStr = "D:\\glo663wb\\bin\\global.exe " + ftype + " " + word;
+	var cmdStr = gtagsGlobalPath + " " + ftype + " " + word;
 	let wordPath = (<vscode.WorkspaceFolder[]>vscode.workspace.workspaceFolders)[0].uri.fsPath;
 	console.log(cmdStr);
 	console.log(wordPath);
@@ -139,28 +81,6 @@ function FindGtagsByWord(word:string, ftype : GtagsFindType):vscode.Location[] |
 	return locations;
 }
 
-function FindDefineAndRefer(uri?: vscode.Uri, position?: vscode.Position){
-	if (vscode.window.activeTextEditor) {
-		// take args from active editor
-		let editor = vscode.window.activeTextEditor;
-		let range = editor.document.getWordRangeAtPosition(editor.selection.active)
-		let word = editor.document.getText(range);
-		let locations = FindGtagsByWord(word, GtagsFindType.Definition);
-		if(!locations){
-			vscode.window.showErrorMessage("未找到\"" + word + "\"的任何定义");
-			return;
-		}
-		if(locations.length == 1){
-			const defaults: vscode.TextDocumentShowOptions = {
-				selection : locations[0].range
-			};
-			let edtior = vscode.window.showTextDocument(locations[0].uri, defaults);
-		}
-		treeViewProvider.setData(locations);
-		vscode.commands.executeCommand(`gtags-result-item.focus`);
-	}
-}
-
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -169,28 +89,21 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "gtagsc" is now active!');
 	gtagsRoot = FindGtagsRoot();
+	if(gtagsRoot == undefined){
+		vscode.window.showErrorMessage("Gtags files (GTAGS, GRTAGS, GPATH) could not be found in this or parent directory");
+		return;
+	}
+	gtagsGlobalPath = vscode.workspace.getConfiguration().get<string>('gtagsSupport.globalPath');
+	if(gtagsGlobalPath == undefined || existsSync(gtagsGlobalPath) == false){
+		vscode.window.showErrorMessage("Setting Error : Gtags can't find in " + gtagsGlobalPath);
+		return;
+	}
 	let defineProcider = new DefinitionProvider();
 	let referenceProvider = new ReferenceProvider();
 	context.subscriptions.push(
-		vscode.commands.registerCommand('gtagsc.FindDefineAndRefer', FindDefineAndRefer),
 		vscode.languages.registerDefinitionProvider(["c","h","cpp"], defineProcider),
 		vscode.languages.registerReferenceProvider(["c","h","cpp"], referenceProvider)
 		);
-	
-	context.subscriptions.push(
-		vscode.commands.registerCommand('itemClick', (loc:vscode.Location) => {
-			const defaults: vscode.TextDocumentShowOptions = {
-				selection : loc.range
-			};
-			vscode.window.showTextDocument(loc.uri, defaults);
-		}));
-
-	// 实例化 TreeViewProvider
-	treeViewProvider = new TreeViewProvider();
-	
-	// registerTreeDataProvider：注册树视图
-	// 你可以类比 registerCommand(上面注册 Hello World)
-	vscode.window.registerTreeDataProvider('gtags-result-item',treeViewProvider);
 }
 
 // this method is called when your extension is deactivated
