@@ -1,5 +1,5 @@
 {
-	"name": "gtagsc",
+	"name": "GTagsForVSCode",
 	"displayName": "gtagsc",
 	"description": "",
 	"version": "0.0.1",
@@ -17,35 +17,18 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "gtagsc.FindDefineAndRefer",
-				"title": "查找定义"
+				"command": "Global.FindFile",
+				"title": "FindFile"
 			}
 		],
 		"viewsContainers": {
-			"activitybar": [
-				{
-					"id": "gtags-explorer",
-					"title": "gtags结果",
-					"icon": "media/list.svg"
-				}
-			]
+
 		},
 		"views": {
-			"gtags-explorer": [
-				{
-					"id": "gtags-result-item",
-					"title": "定义",
-					"name": "item"
-				}
-			]
+
 		},
 		"menus": {
-		  "editor/context": [
-			{
-			  "command": "gtagsc.FindDefineAndRefer",
-			  "when": "editorTextFocus"
-			}
-		  ]
+
 		},
 		"configuration": {
 			"type": "object",
