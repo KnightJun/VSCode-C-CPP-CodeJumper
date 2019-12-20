@@ -17,8 +17,12 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "Global.FindFile",
-				"title": "FindFile"
+				"command": "Global.SearchFile",
+				"title": "Search File"
+			},
+			{
+				"command": "Global.SearchSymbol",
+				"title": "Search Symbol"
 			}
 		],
 		"viewsContainers": {

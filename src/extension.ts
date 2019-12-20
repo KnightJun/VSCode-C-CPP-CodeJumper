@@ -89,12 +89,78 @@ function FindGtagsFile(word:string) : string[]{
 	return tokenList;
 }
 
+function FindGtagsSymbol(word:string) : string[]{
+	let cplList = new vscode.CompletionList();
+	var cmdStr = gtagsGlobalPath + " -c " + word;
+	let wordPath = (<vscode.WorkspaceFolder[]>vscode.workspace.workspaceFolders)[0].uri.fsPath;
+	let exeOpt : ExecSyncOptionsWithStringEncoding;
+	exeOpt =  {cwd : wordPath, encoding: "utf8"};
+	let stdout = execSync(cmdStr,exeOpt);
+	let tokenList = stdout.split("\r\n");
+	return tokenList;
+}
+
+export class GtagsLocation extends vscode.Location {
+	desc?:string;
+	constructor(uri: vscode.Uri, rangeOrPosition: vscode.Range | vscode.Position){
+		super(uri, rangeOrPosition);
+	}
+}
+
+export class GtagsQuickPickItem implements vscode.QuickPickItem {
+		label: string = "a";
+		description?: string;
+		detail?: string;
+		picked?: boolean;
+		alwaysShow?: boolean;
+		location?:vscode.Location;
+}
+
+function ListSymbol() {
+	let items: GtagsQuickPickItem[] = [];
+	vscode.window.showInputBox({ignoreFocusOut:true, 
+		placeHolder:'Symbol prefix.', prompt:'List symbols which start with prefix.  If prefix is not given, print all symbols.'}).then(
+			keyWord =>{
+				if(keyWord == undefined)keyWord = "";
+				let symbolList = FindGtagsSymbol(keyWord);
+				symbolList.map(symbol =>{
+					items.push({label:symbol})
+				})
+				vscode.window.showQuickPick(items, {matchOnDescription:true}).then(
+					pickItem => {
+						if(pickItem == undefined)return;
+						let definitionList = FindGtagsByWord(pickItem.label, GtagsFindType.Definition);
+						if(definitionList == undefined)return;
+						items = [];
+						definitionList.map( loc =>{
+							let fPath = loc.uri.fsPath;
+							fPath = relative(<string>gtagsRoot, fPath)
+							items.push({label:basename(fPath), 
+								description:dirname(fPath), 
+								detail : loc.desc,
+								location:loc});
+						});
+						vscode.window.showQuickPick(items, {matchOnDescription:true}).then(
+							pickItem => {
+								if(pickItem == undefined)return;
+								if(pickItem.location == undefined)return;
+								const defaults: vscode.TextDocumentShowOptions = {
+									selection : pickItem.location.range
+								};
+								vscode.window.showTextDocument(pickItem.location.uri, defaults);
+							}
+						)
+					}
+				);
+			}
+		)
+}
+
 function ListFile() {
 	let items: vscode.QuickPickItem[] = [];
 	vscode.window.showInputBox({ignoreFocusOut:true, 
 		placeHolder:'File name key word.', prompt:'None for all file'}).then(
 			keyWord =>{
-				console.log("|" + keyWord + "|")
 				if(keyWord == undefined)keyWord = "";
 				let filePaths = FindGtagsFile(keyWord);
 				filePaths.map(fPath =>{
@@ -112,8 +178,8 @@ function ListFile() {
 			}
 		)
 }
-function FindGtagsByWord(word:string, ftype : GtagsFindType):vscode.Location[] | undefined{
-	let locations : vscode.Location[] = [];
+function FindGtagsByWord(word:string, ftype : GtagsFindType) : GtagsLocation[] | undefined{
+	let locations : GtagsLocation[] = [];
 	var cmdStr = gtagsGlobalPath + " " + ftype + " " + word;
 	let wordPath = (<vscode.WorkspaceFolder[]>vscode.workspace.workspaceFolders)[0].uri.fsPath;
 	let exeOpt : ExecSyncOptionsWithStringEncoding;
@@ -128,7 +194,8 @@ function FindGtagsByWord(word:string, ftype : GtagsFindType):vscode.Location[] |
 			regex.lastIndex++;
 		}
 		let pos = new vscode.Position(Number(findResult[2]) - 1, 0);
-		let loction = new vscode.Location(vscode.Uri.file(findResult[3]), new vscode.Range(pos, pos));
+		let loction = new GtagsLocation(vscode.Uri.file(findResult[3]), new vscode.Range(pos, pos));
+		loction.desc = findResult[2] + " : " + findResult[4]
 		locations.push(loction);
 		findResult = regex.exec(stdout);
 	}
@@ -157,7 +224,8 @@ export function activate(context: vscode.ExtensionContext) {
 	let referenceProvider = new ReferenceProvider();
 	let completionItemProvider = new CompletionItemProvider();
 	context.subscriptions.push(
-		vscode.commands.registerCommand("Global.FindFile", ListFile),
+		vscode.commands.registerCommand("Global.SearchFile", ListFile),
+		vscode.commands.registerCommand("Global.SearchSymbol", ListSymbol),
 		vscode.languages.registerDefinitionProvider(["c","h","cpp"], defineProcider),
 		vscode.languages.registerReferenceProvider(["c","h","cpp"], referenceProvider),
 		vscode.languages.registerCompletionItemProvider(["c","h","cpp"], completionItemProvider)
