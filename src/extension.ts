@@ -44,20 +44,30 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
 export class CompletionItemProvider implements vscode.CompletionItemProvider {
 	provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext):
 		vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
-		let range = document.getWordRangeAtPosition(position)
-		let word = document.getText(range);
-		let symList = gtagCtl.listSymbol(word);
-		let items : vscode.CompletionItem[] = [];
-		if(!symList){
-			return items;
-		}
-		let completionList = new vscode.CompletionList;
-		symList.map(sym => {
-			items.push( new vscode.CompletionItem(sym, vscode.CompletionItemKind.Function));
-		});
-		return completionList;
+		return new Promise<vscode.CompletionList>((resolve, reject) => {
+            try {
+				/* 检查设置 */
+				if(!vscode.workspace.getConfiguration().get<boolean>('gtagsSupport.CompletionItem'))return reject();
+				let range = document.getWordRangeAtPosition(position)
+				let word = document.getText(range);
+				let symList = gtagCtl.listSymbol(word);
+				let items : vscode.CompletionItem[] = [];
+				if(!symList){
+					return items;
+				}
+				let completionList = new vscode.CompletionList;
+				symList.map(sym => {
+					items.push( new vscode.CompletionItem(sym, vscode.CompletionItemKind.Function));
+				});
+				completionList.isIncomplete = true;
+				return resolve(completionList);
+            } catch (e) {
+                vscode.window.showErrorMessage("provideCompletionItems failed: " + e);
+                return reject(e);
+            }
+        });
 	}
-}
+	}
 
 export class VSCodeGtagsLocation extends vscode.Location {
 	desc?: string;

@@ -1,13 +1,14 @@
 {
-	"name": "GTagsForVSCode",
-	"displayName": "gtagsc",
-	"description": "",
+	"name": "c-cpp-analysis",
+	"displayName": "C/C++ CodeJumper",
+	"description": "Base on GNU Global, Jump to definition, reference, source file",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.36.0"
 	},
+	"publisher": "KnightJun",
 	"categories": [
-		"Other"
+		"Programming Languages"
 	],
 	"activationEvents": [
 		"onLanguage:c",
@@ -18,11 +19,11 @@
 		"commands": [
 			{
 				"command": "Global.SearchFile",
-				"title": "Search File"
+				"title": "GTags:Search File"
 			},
 			{
 				"command": "Global.SearchSymbol",
-				"title": "Search Symbol"
+				"title": "GTags:Search Symbol"
 			}
 		],
 		"viewsContainers": {
@@ -32,7 +33,18 @@
 
 		},
 		"menus": {
-
+			"editor/context": [
+                {
+                    "when": "config.gtagsSupport.SearchFileInMenu",
+                    "command": "Global.SearchFile",
+                    "group": "GTags"
+				},
+                {
+                    "when": "config.gtagsSupport.SearchSymbolInMenu",
+                    "command": "Global.SearchSymbol",
+                    "group": "GTags"
+                }
+            ]
 		},
 		"configuration": {
 			"type": "object",
@@ -42,6 +54,21 @@
 					"type": "string",
 					"default": "D:\\glo663wb\\bin\\global.exe",
 					"description": "global path"
+				},
+				"gtagsSupport.CompletionItem": {
+					"type": "boolean",
+					"default": true,
+					"description": "open completionItem features"
+				},
+				"gtagsSupport.SearchFileInMenu": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show search file command in context menu"
+				},
+				"gtagsSupport.SearchSymbolInMenu": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show search symbol command in context menu"
 				}
 			}
 		}
@@ -52,7 +79,16 @@
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile",
 		"test": "node ./out/test/runTest.js"
-	},
+	},    
+    "license": "SEE LICENSE IN LICENSE.txt",
+    "bugs": {
+        "url": "https://github.com/knightjun/VSCode-C-CPP-CodeJumper/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/knightjun/VSCode-C-CPP-CodeJumper"
+    },
+    "homepage": "https://github.com/knightjun/VSCode-C-CPP-CodeJumper/README.md",
 	"devDependencies": {
 		"@types/glob": "^7.1.1",
 		"@types/mocha": "^5.2.6",
