@@ -1,5 +1,5 @@
 {
-	"name": "c-cpp-analysis",
+	"name": "c-cpp-codejumper",
 	"displayName": "C/C++ CodeJumper",
 	"description": "Base on GNU Global, Jump to definition, reference, source file",
 	"version": "0.0.1",
@@ -19,12 +19,12 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "Global.SearchFile",
-				"title": "GTags:Search File"
+				"command": "CodeJumper.SearchFile",
+				"title": "CodeJumper:Search File"
 			},
 			{
-				"command": "Global.SearchSymbol",
-				"title": "GTags:Search Symbol"
+				"command": "CodeJumper.SearchSymbol",
+				"title": "CodeJumper:Search Symbol"
 			}
 		],
 		"viewsContainers": {
@@ -36,37 +36,37 @@
 		"menus": {
 			"editor/context": [
                 {
-                    "when": "config.gtagsSupport.SearchFileInMenu",
-                    "command": "Global.SearchFile",
-                    "group": "GTags"
+                    "when": "config.CodeJumper.SearchFileInMenu",
+                    "command": "CodeJumper.SearchFile",
+                    "group": "CodeJumper"
 				},
                 {
-                    "when": "config.gtagsSupport.SearchSymbolInMenu",
-                    "command": "Global.SearchSymbol",
-                    "group": "GTags"
+                    "when": "config.CodeJumper.SearchSymbolInMenu",
+                    "command": "CodeJumper.SearchSymbol",
+                    "group": "CodeJumper"
                 }
             ]
 		},
 		"configuration": {
 			"type": "object",
-			"title": "GTags Setting",
+			"title": "CodeJumper",
 			"properties": {
-				"gtagsSupport.globalPath": {
+				"CodeJumper.globalPath": {
 					"type": "string",
-					"default": "D:\\glo663wb\\bin\\global.exe",
+					"default": "",
 					"description": "global path"
 				},
-				"gtagsSupport.CompletionItem": {
+				"CodeJumper.CompletionItem": {
 					"type": "boolean",
 					"default": true,
 					"description": "open completionItem features"
 				},
-				"gtagsSupport.SearchFileInMenu": {
+				"CodeJumper.SearchFileInMenu": {
 					"type": "boolean",
 					"default": false,
 					"description": "Show search file command in context menu"
 				},
-				"gtagsSupport.SearchSymbolInMenu": {
+				"CodeJumper.SearchSymbolInMenu": {
 					"type": "boolean",
 					"default": false,
 					"description": "Show search symbol command in context menu"

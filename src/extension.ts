@@ -47,7 +47,7 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
 		return new Promise<vscode.CompletionList>((resolve, reject) => {
             try {
 				/* 检查设置 */
-				if(!vscode.workspace.getConfiguration().get<boolean>('gtagsSupport.CompletionItem'))return reject();
+				if(!vscode.workspace.getConfiguration().get<boolean>('CodeJumper.CompletionItem'))return reject();
 				let range = document.getWordRangeAtPosition(position)
 				let word = document.getText(range);
 				let symList = gtagCtl.listSymbol(word);
@@ -168,7 +168,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	let gtagsGlobalPath = vscode.workspace.getConfiguration().get<string>('gtagsSupport.globalPath');
+	let gtagsGlobalPath = vscode.workspace.getConfiguration().get<string>('CodeJumper.globalPath');
 	let wordPath = (<vscode.WorkspaceFolder[]>vscode.workspace.workspaceFolders)[0].uri.fsPath;
 	gtagCtl = new GtagsCtl(wordPath, gtagsGlobalPath);
 	if (gtagCtl.initFlat == false) {
@@ -180,8 +180,8 @@ export function activate(context: vscode.ExtensionContext) {
 	let referenceProvider = new ReferenceProvider();
 	let completionItemProvider = new CompletionItemProvider();
 	context.subscriptions.push(
-		vscode.commands.registerCommand("Global.SearchFile", ListFile),
-		vscode.commands.registerCommand("Global.SearchSymbol", ListSymbol),
+		vscode.commands.registerCommand("CodeJumper.SearchFile", ListFile),
+		vscode.commands.registerCommand("CodeJumper.SearchSymbol", ListSymbol),
 		vscode.languages.registerDefinitionProvider(["c", "h", "cpp"], defineProcider),
 		vscode.languages.registerReferenceProvider(["c", "h", "cpp"], referenceProvider),
 		vscode.languages.registerCompletionItemProvider(["c", "h", "cpp"], completionItemProvider)
