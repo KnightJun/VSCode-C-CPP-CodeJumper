@@ -7,6 +7,7 @@
 		"vscode": "^1.36.0"
 	},
 	"publisher": "KnightJun",
+	"icon": "media/main.png",
 	"categories": [
 		"Programming Languages"
 	],
