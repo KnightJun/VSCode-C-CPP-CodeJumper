@@ -25,6 +25,10 @@
 			{
 				"command": "CodeJumper.SearchSymbol",
 				"title": "CodeJumper:Search Symbol"
+			},
+			{
+				"command": "CodeJumper.JumpToHeaderFile",
+				"title": "CodeJumper:Jump to header file"
 			}
 		],
 		"viewsContainers": {
@@ -43,6 +47,11 @@
                 {
                     "when": "config.CodeJumper.SearchSymbolInMenu",
                     "command": "CodeJumper.SearchSymbol",
+                    "group": "CodeJumper"
+                },
+                {
+                    "when": "config.CodeJumper.JumpToHeaderFileInMenu",
+                    "command": "CodeJumper.JumpToHeaderFile",
                     "group": "CodeJumper"
                 }
             ]
@@ -70,6 +79,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Show search symbol command in context menu"
+				},
+				"CodeJumper.JumpToHeaderFileInMenu": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show jump to header file command in context menu"
 				}
 			}
 		}

@@ -68,6 +68,21 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
         });
 	}
 	}
+function JumpToHeaderFile(uri?: vscode.Uri, position?: vscode.Position){
+	if (vscode.window.activeTextEditor) {
+		// take args from active editor
+		let editor = vscode.window.activeTextEditor;
+		let line = editor.document.lineAt(editor.selection.active.line).text
+		const regex = /#include\s[<"](.*?)[>"]/gm;
+		let findResult = regex.exec(line);
+		if(findResult == null){
+			vscode.window.showErrorMessage("Please move the cursor to the '#include' line")
+			return;
+		}
+		let filename = findResult[1];
+		ShowFileListOnTop("/"+filename + "$");
+	}
+}
 
 export class VSCodeGtagsLocation extends vscode.Location {
 	desc?: string;
@@ -136,28 +151,41 @@ function ListSymbol() {
 	)
 }
 
-function ListFile() {
+function ShowFileListOnTop(keyWord: string)
+{
 	let items: vscode.QuickPickItem[] = [];
+	let filePaths = gtagCtl.listFiles(keyWord);
+	if (filePaths == undefined) {
+		vscode.window.showWarningMessage("Can't find the file :" + keyWord);
+		return;
+	}
+	if(filePaths.length == 1){
+		let fileUri = vscode.Uri.file(filePaths[0]);
+		vscode.window.showTextDocument(fileUri);
+		return;
+	}
+	filePaths.map(fPath => {
+		fPath = relative(gtagCtl.gtagsPath, fPath)
+		items.push({ label: basename(fPath), description: dirname(fPath) })
+	})
+	vscode.window.showQuickPick(items, { matchOnDescription: true, ignoreFocusOut :true }).then(
+		pickItem => {
+			if (pickItem == undefined) return;
+			let fPath = join(gtagCtl.gtagsPath, <string>pickItem.description, pickItem.label);
+			let fileUri = vscode.Uri.file(fPath);
+			vscode.window.showTextDocument(fileUri);
+		}
+	);
+}
+
+function ListFile() {
 	vscode.window.showInputBox({
 		ignoreFocusOut: true,
 		placeHolder: 'File name key word.', prompt: 'None for all file'
 	}).then(
 		keyWord => {
 			if (keyWord == undefined) keyWord = "";
-			let filePaths = gtagCtl.listFiles(keyWord);
-			if (filePaths == undefined) return;
-			filePaths.map(fPath => {
-				fPath = relative(gtagCtl.gtagsPath, fPath)
-				items.push({ label: basename(fPath), description: dirname(fPath) })
-			})
-			vscode.window.showQuickPick(items, { matchOnDescription: true, ignoreFocusOut :true }).then(
-				pickItem => {
-					if (pickItem == undefined) return;
-					let fPath = join(gtagCtl.gtagsPath, <string>pickItem.description, pickItem.label);
-					let fileUri = vscode.Uri.file(fPath);
-					vscode.window.showTextDocument(fileUri);
-				}
-			);
+			ShowFileListOnTop(keyWord);
 		}
 	)
 }
@@ -182,6 +210,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand("CodeJumper.SearchFile", ListFile),
 		vscode.commands.registerCommand("CodeJumper.SearchSymbol", ListSymbol),
+		vscode.commands.registerCommand("CodeJumper.JumpToHeaderFile", JumpToHeaderFile),
 		vscode.languages.registerDefinitionProvider(["c", "h", "cpp"], defineProcider),
 		vscode.languages.registerReferenceProvider(["c", "h", "cpp"], referenceProvider),
 		vscode.languages.registerCompletionItemProvider(["c", "h", "cpp"], completionItemProvider)
