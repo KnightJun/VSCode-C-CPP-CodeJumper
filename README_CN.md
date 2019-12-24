@@ -1,6 +1,6 @@
 
 # CodeJumper README
-[English Docs](https://github.com/microsoft/vscode-cpptools/blob/master/README.md) | [中文文档](https://github.com/microsoft/vscode-cpptools/blob/master/README_CN.md)
+[English Docs](https://github.com/knightjun/VSCode-C-CPP-CodeJumper/blob/master/README.md) | [中文文档](https://github.com/knightjun/VSCode-C-CPP-CodeJumper/blob/master/README_CN.md)
 
 CodeJumper是基于[GNU Global](https://www.gnu.org/software/global/)的VSCode插件，用于在C/C++项目查找符号定义，引用，跳转文件，自动补全等。在大型项目中，如果打开整个项目会导致卡顿，此扩展可以在打开其中一个模块的情况下检索整个项目的符号，检索速度飞快。
 
