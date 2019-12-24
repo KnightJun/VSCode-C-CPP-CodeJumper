@@ -1,4 +1,7 @@
+
 # CodeJumper README
+
+[English Docs](https://github.com/microsoft/vscode-cpptools/blob/master/README.md) | [中文文档](https://github.com/microsoft/vscode-cpptools/blob/master/README_CN.md)
 
 CodeJumper is a VSCode plugin based on [GNU Global] (https://www.gnu.org/software/global/). It is used to find symbol definitions, references, jump files, auto-completion, etc. in C/C++ projects. If the large project is opened in VSCode, it will cause a freeze. This extension can retrieve the symbol of the entire project when one of the modules open, and the speed is very fast.
 
