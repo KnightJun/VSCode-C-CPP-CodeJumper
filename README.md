@@ -1,72 +1,56 @@
 # CodeJumper README
 
-CodeJumper是基于GNU Global[https://www.gnu.org/software/global/]的VSCode插件，用于在C/C++项目查找符号定义，引用，跳转文件，自动补全等。在大型项目中，如果打开整个项目会导致卡顿，此扩展可以在打开其中一个模块的情况下检索整个项目的符号，检索速度飞快。
+CodeJumper is a VSCode plugin based on [GNU Global] (https://www.gnu.org/software/global/). It is used to find symbol definitions, references, jump files, auto-completion, etc. in C/C++ projects. If the large project is opened in VSCode, it will cause a freeze. This extension can retrieve the symbol of the entire project when one of the modules open, and the speed is very fast.
 
-> 该扩展建议用于大型C/C++项目，小型项目建议使用C/C++插件[https://github.com/Microsoft/vscode-cpptools.git]
+> This extension is recommended for large C/C ++ projects, and small projects are recommended to use [C/C++ Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
 
-## 功能列表
+## Usage
 
-* 查找符号定义
-* 查找符号引用
-* 检索项目文件
-* 跳转头文件
+The extension is based on[GNU Global](https://www.gnu.org/software/global/)，You need to install GUN Global first, execute the `gtags` command in the project root directory to produce a TAG file, and then you can use VSCode to open any module of the project to retrieve the symbols of the entire project.
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+> Note: The TAG file is not updated in real time. If the source file is changed after the TAG file generated, it may cause positioning errors. You need to re-execute the gtags command in the root directory to generate the TAG file again. Or execute the `global -u` command in the changed source directory to update the TAG file
 
-For example if there is an image subfolder under your extension project workspace:
+## Features
 
-\!\[feature X\]\(images/feature-x.png\)
+* Find symbol definitions
+  
+![Find symbol definitions](Tutorial/FindDefinition.gif)
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+* Find symbol references
+  
+![Find symbol references](Tutorial/FindReferences.gif)
 
-## Requirements
+* Search project files
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+![Retrieve project files](Tutorial/SearchFile.gif)
 
-## Extension Settings
+* Search symbol
+  
+![Search symbol](Tutorial/SearchSymbol.gif)
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+* Jump header
 
-For example:
+![Jump header](Tutorial/JumpToHeader.gif)
 
-This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+> The features of retrieving symbols, retrieving project files, and jumping header files can be set as right-click menu in the settings
+
+## Extended Settings
+
+* `CodeJumper.globalPath`：The default is empty, set the path of the global program, if the path where the global is set is added to the environment variable, it can be empty.
+* `CodeJumper.CompletionItem`：Enable by default, If it freezes during auto-completion, you can turn it off.
+* `CodeJumper.SearchFileInMenu`：Disabled by default, show command to retrieve files in right-click menu.
+* `CodeJumper.SearchSymbolInMenu`：Disabled by default, show search symbol command in right-click menu.
+* `CodeJumper.JumpToHeaderFileInMenu`：Disabled by default, show jump to header command in right-click menu.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+* Spaces in the project path may cause exceptions
+* Only tested under windows
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.1
 
-### 1.0.0
+Initial Release
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**

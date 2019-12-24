@@ -1,12 +1,12 @@
 # CodeJumper README
 
-CodeJumper是基于GNU Global[https://www.gnu.org/software/global/]的VSCode插件，用于在C/C++项目查找符号定义，引用，跳转文件，自动补全等。在大型项目中，如果打开整个项目会导致卡顿，此扩展可以在打开其中一个模块的情况下检索整个项目的符号，检索速度飞快。
+CodeJumper是基于[GNU Global](https://www.gnu.org/software/global/)的VSCode插件，用于在C/C++项目查找符号定义，引用，跳转文件，自动补全等。在大型项目中，如果打开整个项目会导致卡顿，此扩展可以在打开其中一个模块的情况下检索整个项目的符号，检索速度飞快。
 
-> 该扩展建议用于大型C/C++项目，小型项目建议使用C/C++插件[https://github.com/Microsoft/vscode-cpptools.git]
+> 该扩展建议用于大型C/C++项目，小型项目建议使用[C/C++插件](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
 
 ## 使用说明
 
-该插件基于GNU Global[https://www.gnu.org/software/global/]，需要先安装GUN Global，在项目根目录下执行`  gtags  `命令生产TAG文件，然后可以用VSCode打开项目的任意一个模块，可检索整个项目的符号。
+该插件基于[GNU Global](https://www.gnu.org/software/global/)，需要先安装GUN Global，在项目根目录下执行`  gtags  `命令生产TAG文件，然后可以用VSCode打开项目的任意一个模块，可检索整个项目的符号。
 
 > 注意，TAG文件不会实时更新，如果源码文件在TAG文件生成后有更改，可能会导致定位错误，需要重新在根目录执行gtags命令重新生成TAG文件。或在更改的源码目录中执行`global -u`命令更新TAG文件
 
